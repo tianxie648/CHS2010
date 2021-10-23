@@ -11,8 +11,8 @@ dev.off()
 setwd("D:/OneDrive - University College London/CHS2010")
 
 
-### Replicate Table A9-1, supplement
 
+### Replicate Table A9-1, supplement
 # install.packages("modelsummary")
 library("modelsummary")
 
@@ -25,16 +25,17 @@ library('haven')
 # Load data
 data <- read_dta('Data/data.dta')
 
+
 ## Gestation length
 # Pick the first observation of the same childid, because
 # observations with the same childid have the same gestation
 data <- data %>% group_by(childid) %>% 
-  mutate(test_gestlenght = as.numeric(row_number() == 1L) )
-data$test_gestlenght[data$test_gestlenght == 0] <- NaN
+  mutate(test_first = as.numeric(row_number() == 1L) )
+data$test_first[data$test_first == 0] <- NaN
 
 # Exclude obs with negative gestation length
-data$test_gestlenght[data$gestlenght < 0] <- NaN
-data$test_gestlenght <- data$test_gestlenght * data$gestlenght
+data$test_first[data$gestlenght < 0] <- NaN
+data$test_gestlenght <- data$test_first * data$gestlenght
 
 # Simple summary to check
 datasummary(('Gestation Length (10 Weeks)' = 
@@ -42,6 +43,15 @@ datasummary(('Gestation Length (10 Weeks)' =
                                     SD * Arguments(fmt = "%.3f")),
             sparse_header = FALSE,
             data = data)
+
+
+
+
+
+
+
+
+
 
 
 
