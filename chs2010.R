@@ -45,10 +45,22 @@ datasummary(('Gestation Length (10 Weeks)' =
             data = data)
 
 
+## Weight at birth
+# Pick the first observation of the same childid
+data <- data %>% group_by(childid) %>% 
+  mutate(test_first = as.numeric(row_number() == 1L) )
+data$test_first[data$test_first == 0] <- NaN
 
+# Exclude obs with negative weight at birth
+data$test_first[data$weightbirth < 0] <- NaN
+data$test_weightbirth <- data$test_first * data$weightbirth
 
-
-
+# Simple summary to check
+datasummary(('Weight at Birth' = 
+               test_weightbirth)~ (N + Mean * Arguments(fmt = "%.3f")+ 
+                                    SD * Arguments(fmt = "%.3f")),
+            sparse_header = FALSE,
+            data = data)
 
 
 
