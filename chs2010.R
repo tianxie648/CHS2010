@@ -87,6 +87,17 @@ datasummary(('Motor-Social Development Score' =
             data = data)
 
 
+## (4/9 Cognitive) Body parts
+# Exclude obs with -100
+data$test_bp <- data$bp
+data$test_bp[data$bp < -99] <- NaN
 
+# Simple summary to check
+datasummary(('Body Parts' = 
+               test_bp)~ test_age *
+              (N + Mean * Arguments(fmt = "%.3f")+ 
+                 SD * Arguments(fmt = "%.3f")),
+            sparse_header = FALSE,
+            data = data)
 
 
