@@ -26,7 +26,7 @@ library('haven')
 data <- read_dta('Data/data.dta')
 
 
-## Gestation length
+## (1/9 Cognitive) Gestation length
 # Pick the first observation of the same childid, because
 # observations with the same childid have the same gestation
 data <- data %>% group_by(childid) %>% 
@@ -45,7 +45,7 @@ datasummary(('Gestation Length (10 Weeks)' =
             data = data)
 
 
-## Weight at birth
+## (2/9 Cognitive) Weight at birth 
 # Pick the first observation of the same childid
 data <- data %>% group_by(childid) %>% 
   mutate(test_first = as.numeric(row_number() == 1L) )
@@ -63,6 +63,28 @@ datasummary(('Weight at Birth' =
             data = data)
 
 
+## (3/9 Cognitive) Motor-social
+# Exclude obs with -100 score
+data$test_msd <- data$msd
+data$test_msd[data$msd < -99] <- NaN
+
+# Simple summary to check
+temp_age <- data.frame(age = c(0,1,3,5,7,9,11,13), 
+                       test_age = c('Period 1: Year of Birth of Child',
+                                    'Period 2: Ages 1-2',
+                                    'Period 3: Ages 3-4',
+                                    'Period 4: Ages 5-6',
+                                    'Period 5: Ages 7-8',
+                                    'Period 6: Ages 9-10',
+                                    'Period 7: Ages 11-12',
+                                    'Period 8: Ages 13-14')) 
+data <- merge(data, temp_age, by = 'age')
+datasummary(('Motor-Social Development Score' = 
+               test_msd)~ test_age *
+              (N + Mean * Arguments(fmt = "%.3f")+ 
+                                     SD * Arguments(fmt = "%.3f")),
+            sparse_header = FALSE,
+            data = data)
 
 
 
