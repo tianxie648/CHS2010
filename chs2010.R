@@ -101,3 +101,20 @@ datasummary(('Body Parts' =
             data = data)
 
 
+## (5/9 Cognitive) Memory for locations
+# Exclude obs with -100
+data$test_ml <- data$ml
+data$test_ml[data$ml < -99] <- NaN
+
+# Simple summary to check
+datasummary(('Memory for Locations' = 
+               test_ml)~ test_age *
+              (N + Mean * Arguments(fmt = "%.3f")+ 
+                 SD * Arguments(fmt = "%.3f")),
+            sparse_header = FALSE,
+            data = data)
+
+
+
+
+
