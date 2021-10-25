@@ -130,7 +130,18 @@ datasummary(('Peabody Picture Vocabulary Test' =
             data = data)
 
 
+##' (7/9 Cognitive) PIAT math
+#' Exclude obs with -100
+data$rep_math <- data$math
+data$rep_math[data$math < -99] <- NaN
 
+#' Simple summary to check
+datasummary(('PIAT Math' = 
+               rep_math)~ rep_age *
+              (N + Mean * Arguments(fmt = "%.3f")+ 
+                 SD * Arguments(fmt = "%.3f")),
+            sparse_header = FALSE,
+            data = data)
 
 
 
