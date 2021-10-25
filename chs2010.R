@@ -115,6 +115,17 @@ datasummary(('Memory for Locations' =
             data = data)
 
 
+## (6/9 Cognitive) Peabody picture vocabulary test
+# Exclude obs with -100
+data$test_ppvt <- data$ppvt
+data$test_ppvt[data$ppvt < -99] <- NaN
 
+# Simple summary to check
+datasummary(('Peabody Picture Vocabulary Test' = 
+               test_ppvt)~ test_age *
+              (N + Mean * Arguments(fmt = "%.3f")+ 
+                 SD * Arguments(fmt = "%.3f")),
+            sparse_header = FALSE,
+            data = data)
 
 
