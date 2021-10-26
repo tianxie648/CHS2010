@@ -7,20 +7,18 @@
 
 ###' Cleaning and working directory
 rm(list = ls())
-dev.off()
+#dev.off()
+local({r <- getOption("repos"); r["CRAN"] <- "http://cran.r-project.org"; options(repos=r)}) #set repo
 setwd("D:/OneDrive - University College London/CHS2010")
 
 
 
 ###' Replicate Table A9-1, supplement
-#' install.packages("modelsummary")
-library("modelsummary")
 
-#' install.packages('dplyr')
-library('dplyr')
+pkg<-list("modelsummary","dplyr","haven")
+lapply(pkg, require, character.only=T)
+rm(pkg)
 
-#' Load package to read .dta data
-library('haven')
 
 #' Load data
 dat <- read_dta('Data/data.dta')
@@ -56,69 +54,56 @@ inputNaN <- function(var, data){
 sumtable <- function(var, label, data){
   a <- paste('(\'', label,'\' = rep_',var ,')', sep = '')
   b <- '~ rep_age * (N + Mean * Arguments(fmt = \'%.3f\')+ SD * Arguments(fmt = \'%.3f\'))'
-  datasummary(as.formula(paste(a,b)),
+  c <- datasummary(as.formula(paste(a,b)),
               sparse_header = FALSE,
               data = data)
+  return(c)
 }
 
 
-##' (1/9 Cognitive) Gestation length
+##' Summary Statistics Table
 #' Pick the first observation of the same childid, because
 #' observations with the same childid have the same gestation
 dat <- dat %>% group_by(childid) %>% 
   mutate(rep_first = as.numeric(row_number() == 1L) )
 dat$rep_first[dat$rep_first == 0] <- NaN
 
-#' Exclude obs with negative gestation length and make the summary
+#' The following transformations are needed to report results
+#' that only consider the first period. Inputs for function
+#' sumtable()
 dat <- inputNaN(var = 'gestlenght', data = dat)
-dat$rep_gestlenght <- dat$rep_gestlenght * dat$rep_first
-sumtable(var = 'gestlenght', label = 'Gestation Length',data = dat)
-
-
-##' (2/9 Cognitive) Weight at birth 
-#' Pick the first observation of the same childid
-data <- data %>% group_by(childid) %>% 
-  mutate(rep_first = as.numeric(row_number() == 1L) )
-data$rep_first[data$rep_first == 0] <- NaN
-
-#' Exclude obs with negative weight at birth and make the summary
 dat <- inputNaN(var = 'weightbirth', data = dat)
+dat$rep_gestlenght <- dat$rep_gestlenght * dat$rep_first
 dat$rep_weightbirth <- dat$rep_weightbirth * dat$rep_first
-sumtable(var = 'weightbirth', label = 'Weight at Birth',data = dat)
 
+#'  Remove observations with -100 scores. 
+#'  
+#'  Step 1. Begin with a list of such variables. The elemtns  
+#'  of the list correspond with rows in table A9-1 in CHS.
+#'  The list contains:
+#'  a) Gestation length
+#'  b) Weight at birth
+#'  c) Motor-Social Development Score
+#'  d) Body Parts
+#'  f) Memory for Locations
+#'  g) Peabody Picture Vocabulary Test
+#'  h) PIAT Math
 
-##' (3/9 Cognitive) Motor-social
-#' Exclude obs with -100 score and make the summary
-dat <- inputNaN(var = 'msd', data = dat)
-sumtable(var = 'msd', label = 'Motor-Social Development Score',data = dat)
+list.covar        <- c("gestlenght","weightbirth","msd","bp","ml","ppvt","math")
+labels.list.covar <- c("Gestation length","Weight at birth","Motor-Social Development Score",
+                       "Body Parts","Memory for Locations","Peabody Picture Vocabulary Test",
+                       "PIAT Math")
 
+#'  Step 2. Remove observations with -100 scores. This operation returns a list of data.frames.
+#'  The j-th element in the list is a data.frame excluding -100 scores for the j-th variable
+#'  for all j in list.covar. For Example, the second element in list.data is a copy of dat
+#'  such that variable 'weightbirth' no longer has -100 scores.
+list.data <- lapply(list.covar, function(s,dat){inputNaN(var = s, data = dat)},dat)
 
-##' (4/9 Cognitive) Body parts
-#' Exclude obs with -100 and make the summary
-dat <- inputNaN(var = 'bp', data = dat)
-sumtable(var = 'bp', label = 'Body Parts',data = dat)
+#'  Step 3. Summary of results. This operation returns a list whose elements are summary tables.
+#'  The j-th element in the list is the summary table for the j-th covariate in list.covar
+list.sumtables <- lapply(1:length(list.covar), function(s) sumtable(var=list.covar[s],label = labels.list.covar[s],data = list.data[[s]]))
 
-
-##' (5/9 Cognitive) Memory for locations
-#' Exclude obs with -100 and make the summary
-dat <- inputNaN(var = 'ml', data = dat)
-sumtable(var = 'ml', label = 'Memory for Locations',data = dat)
-
-
-##' (6/9 Cognitive) Peabody picture vocabulary test
-#' Exclude obs with -100 and make the summary
-dat <- inputNaN(var = 'ppvt', data = dat)
-sumtable(var = 'ppvt', label = 'Peabody Picture Vocabulary Test',data = dat)
-
-
-##' (7/9 Cognitive) PIAT math
-#' Exclude obs with -100 and make the summary
-dat <- inputNaN(var = 'math', data = dat)
-sumtable(var = 'math', label = 'PIAT Math',data = dat)
-
-
-
-
-
-
+# Visualization. Summary table for "Motor-Social Development Score" (third element in list.covar)
+list.sumtables[[3]]
 
