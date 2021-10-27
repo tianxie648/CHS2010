@@ -91,14 +91,15 @@ dat$rep_weightbirth <- dat$rep_weightbirth * dat$rep_first
 #'  h) PIAT Reading Recognition
 #'  i) PIAT Reading Comprehension
 #'  j) Temperament/Compliance Raw Score
+#'  k) Temperament/Insecure Attachment Raw Score
 
 
 
-list.covar        <- c("rep_gestlenght","rep_weightbirth","msd","bp","ml","ppvt","math","recg","comp","tempE")
+list.covar        <- c("rep_gestlenght","rep_weightbirth","msd","bp","ml","ppvt","math","recg","comp","tempE","tempF")
 labels.list.covar <- c("Gestation length","Weight at birth","Motor-Social Development Score",
                        "Body Parts","Memory for Locations","Peabody Picture Vocabulary Test",
                        "PIAT Math","PIAT Reading Recognition","PIAT Reading Comprehension",
-                       "Temperament/Compliance Raw Score")
+                       "Temperament/Compliance Raw Score","Temperament/Insecure Attachment Raw Score")
 
 #'  Step 2. Remove observations with -100 scores. This operation returns a list of data.frames.
 #'  The j-th element in the list is a data.frame excluding -100 scores for the j-th variable
@@ -111,5 +112,5 @@ list.data <- lapply(list.covar, function(s,dat){inputNaN(var = s, data = dat)},d
 list.sumtables <- lapply(1:length(list.covar), function(s) sumtable(var=list.covar[s],label = labels.list.covar[s],data = list.data[[s]]))
 
 # Visualization. Summary table for "Motor-Social Development Score" (third element in list.covar)
-list.sumtables[[3]]
+list.sumtables[[11]]
 
