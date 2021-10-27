@@ -123,7 +123,7 @@ list.data <- lapply(list.covar, function(s,dat){inputNaN(var = s, data = dat)},d
 #'  The j-th element in the list is the summary table for the j-th covariate in list.covar
 list.sumtables <- lapply(1:length(list.covar), function(s) sumtable(var=list.covar[s],label = labels.list.covar[s],data = list.data[[s]]))
 
-# Visualization. Summary table for "Motor-Social Development Score" (third element in list.covar)
+# Visualization. Summary table for the last variable
 list.sumtables[[length(list.covar)]]
 
 
@@ -169,25 +169,73 @@ labels.list.covar <- c("How Often Child Gets Out of House","Number of Books",
 #'  Step 2. Remove observations with -100 scores. This operation returns a list of data.frames.
 #'  The j-th element in the list is a data.frame excluding -100 scores for the j-th variable
 #'  for all j in list.covar. For Example, the second element in list.data is a copy of dat
-#'  such that variable 'weightbirth' no longer has -100 scores.
+#'  such that variable 'inv02' no longer has -100 scores.
 list.data <- lapply(list.covar, function(s,dat){inputNaN(var = s, data = dat)},dat)
 
 #'  Step 3. Summary of results. This operation returns a list whose elements are summary tables.
 #'  The j-th element in the list is the summary table for the j-th covariate in list.covar
 list.sumtables <- lapply(1:length(list.covar), function(s) sumtable(var=list.covar[s],label = labels.list.covar[s],data = list.data[[s]]))
 
-# Visualization. Summary table for "Motor-Social Development Score" (third element in list.covar)
+# Visualization. Summary table for the last variable
 list.sumtables[[length(list.covar)]]
 
 
 
+###' Replicate Table A9-3, supplement
+
+#' Create a function to exclude obs with -100 value and generate a new variable
+#' Pick the first observation of the same childid, because
+#' observations with the same childid have the same value
+#' @param var string, name of the variable
+#' @param data dataset
+#' @return a new dataset with a new variable added
+inputNaN <- function(var, data){
+  data[[paste('rep_',var,sep = '')]] <- data[[var]]
+  data[[paste('rep_',var,sep = '')]][data[[paste('rep_',var,sep = '')]] < -99] <- NaN
+  data <- data %>% group_by(childid) %>% 
+    mutate(rep_first = as.numeric(row_number() == 1L) )
+  data$rep_first[data$rep_first == 0] <- NaN
+  data[[paste('rep_',var,sep = '')]] <- data[[paste('rep_',var,sep = '')]] * data$rep_first
+  return(data)
+}
+
+#' Create a function to make summaries
+#' @param var string, name of the variable
+#' @param label string, label of the variable, a string
+#' @param data dataset
+#' @return a table
+sumtable <- function(var, label, data){
+  a <- paste('(\'', label,'\' = rep_',var ,')', sep = '')
+  b <- '~ N + Mean * Arguments(fmt = \'%.3f\')+ SD * Arguments(fmt = \'%.3f\')'
+  c <- datasummary(as.formula(paste(a,b)),
+                   sparse_header = FALSE,
+                   data = data)
+  return(c)
+}
 
 
+#'  Step 1. Begin with a list of such variables. The elements  
+#'  of the list correspond with rows in table A9-3 in CHS.
+#'  The list contains:
+#'  a) Mom's Arithmetic Reasoning Test Score
 
 
+list.covar        <- c("asvab2")
+labels.list.covar <- c('Moms Arithmetic Reasoning Test Score')
 
+#'  Step 2. Remove repeated observations and observations with -100 scores. 
+#'  This operation returns a list of data.frames. The j-th element in the list is a data.frame 
+#'  excluding -100 scores and repeated cells for the j-th variable
+#'  for all j in list.covar. For Example, the first element in list.data is a copy of dat
+#'  such that variable 'asvab2' no longer has -100 scores and repeated cells.
+list.data <- lapply(list.covar, function(s,dat){inputNaN(var = s, data = dat)},dat)
 
+#'  Step 3. Summary of results. This operation returns a list whose elements are summary tables.
+#'  The j-th element in the list is the summary table for the j-th covariate in list.covar
+list.sumtables <- lapply(1:length(list.covar), function(s) sumtable(var=list.covar[s],label = labels.list.covar[s],data = list.data[[s]]))
 
+# Visualization. Summary table for the last variable
+list.sumtables[[length(list.covar)]]
 
 
 
