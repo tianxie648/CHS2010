@@ -99,11 +99,12 @@ dat$rep_weightbirth <- dat$rep_weightbirth * dat$rep_first
 #'  p) Behavior Problem Index/Anxiety Raw Score
 #'  q) Behavior Problem Index/Headstrong Raw Score
 #'  r) Behavior Problem Index/Hyperactive Raw Score
+#'  s) Behavior Problem Index/Conflict Raw Score
 
 
 
 list.covar        <- c("rep_gestlenght","rep_weightbirth","msd","bp","ml","ppvt","math","recg","comp",
-                       "tempE","tempF","tempG","tempI","tempJ","bpiA","bpiB","bpiC","bpiD")
+                       "tempE","tempF","tempG","tempI","tempJ","bpiA","bpiB","bpiC","bpiD","bpiE")
 labels.list.covar <- c("Gestation length","Weight at birth","Motor-Social Development Score",
                        "Body Parts","Memory for Locations","Peabody Picture Vocabulary Test",
                        "PIAT Math","PIAT Reading Recognition","PIAT Reading Comprehension",
@@ -111,7 +112,7 @@ labels.list.covar <- c("Gestation length","Weight at birth","Motor-Social Develo
                        "Temperament/Sociability Raw Score","Temperament/Difficulty Raw Score",
                        "Temperament/Friendliness Raw Score","Behavior Problem Index/Antisocial Raw Score",
                        "Behavior Problem Index/Anxiety Raw Score","Behavior Problem Index/Headstrong Raw Score",
-                       "Behavior Problem Index/Hyperactive Raw Score")
+                       "Behavior Problem Index/Hyperactive Raw Score","Behavior Problem Index/Conflict Raw Score")
 
 #'  Step 2. Remove observations with -100 scores. This operation returns a list of data.frames.
 #'  The j-th element in the list is a data.frame excluding -100 scores for the j-th variable
