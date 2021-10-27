@@ -78,7 +78,7 @@ dat$rep_weightbirth <- dat$rep_weightbirth * dat$rep_first
 
 #'  Remove observations with -100 scores. 
 #'  
-#'  Step 1. Begin with a list of such variables. The elemtns  
+#'  Step 1. Begin with a list of such variables. The elements  
 #'  of the list correspond with rows in table A9-1 in CHS.
 #'  The list contains:
 #'  a) Gestation length
@@ -89,7 +89,7 @@ dat$rep_weightbirth <- dat$rep_weightbirth * dat$rep_first
 #'  g) Peabody Picture Vocabulary Test
 #'  h) PIAT Math
 
-list.covar        <- c("gestlenght","weightbirth","msd","bp","ml","ppvt","math")
+list.covar        <- c("rep_gestlenght","rep_weightbirth","msd","bp","ml","ppvt","math")
 labels.list.covar <- c("Gestation length","Weight at birth","Motor-Social Development Score",
                        "Body Parts","Memory for Locations","Peabody Picture Vocabulary Test",
                        "PIAT Math")
