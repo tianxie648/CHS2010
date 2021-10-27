@@ -94,11 +94,12 @@ dat$rep_weightbirth <- dat$rep_weightbirth * dat$rep_first
 #'  k) Temperament/Insecure Attachment Raw Score
 #'  l) Temperament/Sociability Raw Score
 #'  m) Temperament/Difficulty Raw Score
+#'  n) Temperament/Friendliness Raw Score
 
 
 
 list.covar        <- c("rep_gestlenght","rep_weightbirth","msd","bp","ml","ppvt","math","recg","comp",
-                       "tempE","tempF","tempG","tempH")
+                       "tempE","tempF","tempG","tempI")
 labels.list.covar <- c("Gestation length","Weight at birth","Motor-Social Development Score",
                        "Body Parts","Memory for Locations","Peabody Picture Vocabulary Test",
                        "PIAT Math","PIAT Reading Recognition","PIAT Reading Comprehension",
