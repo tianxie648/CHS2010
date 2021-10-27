@@ -89,12 +89,14 @@ dat$rep_weightbirth <- dat$rep_weightbirth * dat$rep_first
 #'  f) Peabody Picture Vocabulary Test
 #'  g) PIAT Math
 #'  h) PIAT Reading Recognition
+#'  i) PIAT Reading Comprehension
 
 
-list.covar        <- c("rep_gestlenght","rep_weightbirth","msd","bp","ml","ppvt","math","recg","comp","tempE","tempF")
+
+list.covar        <- c("rep_gestlenght","rep_weightbirth","msd","bp","ml","ppvt","math","recg","comp")
 labels.list.covar <- c("Gestation length","Weight at birth","Motor-Social Development Score",
                        "Body Parts","Memory for Locations","Peabody Picture Vocabulary Test",
-                       "PIAT Math","PIAT Reading Recognition")
+                       "PIAT Math","PIAT Reading Recognition","PIAT Reading Comprehension")
 
 #'  Step 2. Remove observations with -100 scores. This operation returns a list of data.frames.
 #'  The j-th element in the list is a data.frame excluding -100 scores for the j-th variable
