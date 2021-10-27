@@ -134,10 +134,11 @@ list.sumtables[[length(list.covar)]]
 #'  of the list correspond with rows in table A9-2 in CHS.
 #'  The list contains:
 #'  a) How Often Child Gets Out of House
+#'  b) Number of Books
 
 
-list.covar        <- c("inv01")
-labels.list.covar <- c("How Often Child Gets Out of House")
+list.covar        <- c("inv01","inv02")
+labels.list.covar <- c("How Often Child Gets Out of House","Number of Books")
 
 #'  Step 2. Remove observations with -100 scores. This operation returns a list of data.frames.
 #'  The j-th element in the list is a data.frame excluding -100 scores for the j-th variable
