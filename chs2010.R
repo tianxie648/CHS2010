@@ -102,7 +102,6 @@ dat$rep_weightbirth <- dat$rep_weightbirth * dat$rep_first
 #'  s) Behavior Problem Index/Conflict Raw Score
 
 
-
 list.covar        <- c("rep_gestlenght","rep_weightbirth","msd","bp","ml","ppvt","math","recg","comp",
                        "tempE","tempF","tempG","tempI","tempJ","bpiA","bpiB","bpiC","bpiD","bpiE")
 labels.list.covar <- c("Gestation length","Weight at birth","Motor-Social Development Score",
@@ -126,4 +125,59 @@ list.sumtables <- lapply(1:length(list.covar), function(s) sumtable(var=list.cov
 
 # Visualization. Summary table for "Motor-Social Development Score" (third element in list.covar)
 list.sumtables[[length(list.covar)]]
+
+
+
+###' Replicate Table A9-2, supplement
+
+#'  Step 1. Begin with a list of such variables. The elements  
+#'  of the list correspond with rows in table A9-2 in CHS.
+#'  The list contains:
+#'  a) How Often Child Gets Out of House
+
+
+list.covar        <- c("inv01")
+labels.list.covar <- c("How Often Child Gets Out of House")
+
+#'  Step 2. Remove observations with -100 scores. This operation returns a list of data.frames.
+#'  The j-th element in the list is a data.frame excluding -100 scores for the j-th variable
+#'  for all j in list.covar. For Example, the second element in list.data is a copy of dat
+#'  such that variable 'weightbirth' no longer has -100 scores.
+list.data <- lapply(list.covar, function(s,dat){inputNaN(var = s, data = dat)},dat)
+
+#'  Step 3. Summary of results. This operation returns a list whose elements are summary tables.
+#'  The j-th element in the list is the summary table for the j-th covariate in list.covar
+list.sumtables <- lapply(1:length(list.covar), function(s) sumtable(var=list.covar[s],label = labels.list.covar[s],data = list.data[[s]]))
+
+# Visualization. Summary table for "Motor-Social Development Score" (third element in list.covar)
+list.sumtables[[length(list.covar)]]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
