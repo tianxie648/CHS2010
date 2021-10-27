@@ -137,11 +137,13 @@ list.sumtables[[length(list.covar)]]
 #'  b) Number of Books
 #'  c) How Often Mom Reads to Child
 #'  d) Number of Soft/Role Play Toys
+#'  e) Number of Push/Pull Toys
 
 
-list.covar        <- c("inv01","inv02","inv03","inv05")
+list.covar        <- c("inv01","inv02","inv03","inv05","inv06")
 labels.list.covar <- c("How Often Child Gets Out of House","Number of Books",
-                       "How Often Mom Reads to Child","Number of Soft/Role Play Toys")
+                       "How Often Mom Reads to Child","Number of Soft/Role Play Toys",
+                       "Number of Push/Pull Toys")
 
 #'  Step 2. Remove observations with -100 scores. This operation returns a list of data.frames.
 #'  The j-th element in the list is a data.frame excluding -100 scores for the j-th variable
