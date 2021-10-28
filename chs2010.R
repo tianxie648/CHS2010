@@ -205,7 +205,7 @@ inputNaN <- function(var, data){
 #' @param data dataset
 #' @return a table
 sumtable <- function(var, label, data){
-  a <- paste('Heading(\'', label,'\' )* rep_',var , sep = '')
+  a <- paste('(\'', label,'\' = rep_',var ,')', sep = '')
   b <- '~ N + Mean * Arguments(fmt = \'%.3f\')+ SD * Arguments(fmt = \'%.3f\')'
   c <- datasummary(as.formula(paste(a,b)),
                    sparse_header = FALSE,
@@ -223,12 +223,14 @@ sumtable <- function(var, label, data){
 #'  d) Mom's Numerical Operation Test Score
 #'  e) Mom's Coding Speed Test Score
 #'  f) Mom's Mathematical Knowledge Test Score
+#'  g) Mom's Self-Esteem: "I am a person of worth"
 
 
-list.covar        <- c("asvab2","asvab3","asvab4","asvab5","asvab6","asvab8")
+list.covar        <- c("asvab2","asvab3","asvab4","asvab5","asvab6","asvab8","se1")
 labels.list.covar <- c('Moms Arithmetic Reasoning Test Score', 'Moms Word Knowledge Test Score',
                        'Moms Paragraph Composition Test Score','Moms Numerical Operation Test Score',
-                       'Moms Coding Speed Test Score', 'Moms Mathematical Knowledge Test Score')
+                       'Moms Coding Speed Test Score', 'Moms Mathematical Knowledge Test Score',
+                       'Moms Self-Esteem: I am a person of worth')
 
 #'  Step 2. Remove repeated observations and observations with -100 scores. 
 #'  This operation returns a list of data.frames. The j-th element in the list is a data.frame 
