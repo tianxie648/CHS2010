@@ -225,13 +225,15 @@ sumtable <- function(var, label, data){
 #'  f) Mom's Mathematical Knowledge Test Score
 #'  g) Mom's Self-Esteem: "I am a person of worth"
 #'  h) Mom's Self-Esteem: "I have good qualities"
+#'  i) Mom's Self-Esteem: "I am a failure"
 
 
-list.covar        <- c("asvab2","asvab3","asvab4","asvab5","asvab6","asvab8","se1","se2")
+list.covar        <- c("asvab2","asvab3","asvab4","asvab5","asvab6","asvab8","se1","se2","se3")
 labels.list.covar <- c('Moms Arithmetic Reasoning Test Score', 'Moms Word Knowledge Test Score',
                        'Moms Paragraph Composition Test Score','Moms Numerical Operation Test Score',
                        'Moms Coding Speed Test Score', 'Moms Mathematical Knowledge Test Score',
-                       'Moms Self-Esteem: I am a person of worth', 'Moms Self-Esteem: I have good qualities')
+                       'Moms Self-Esteem: I am a person of worth', 'Moms Self-Esteem: I have good qualities',
+                       'Moms Self-Esteem: I am a failure')
 
 #'  Step 2. Remove repeated observations and observations with -100 scores. 
 #'  This operation returns a list of data.frames. The j-th element in the list is a data.frame 
