@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{6989167D-11E4-40FE-8C1A-2192A86A7E90}") = "kerndens", "kerndens.vfproj", "{5EDE078B-86E9-42F6-B25A-4CAA7ABFA537}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5EDE078B-86E9-42F6-B25A-4CAA7ABFA537}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5EDE078B-86E9-42F6-B25A-4CAA7ABFA537}.Debug|Win32.Build.0 = Debug|Win32
+		{5EDE078B-86E9-42F6-B25A-4CAA7ABFA537}.Release|Win32.ActiveCfg = Release|Win32
+		{5EDE078B-86E9-42F6-B25A-4CAA7ABFA537}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
