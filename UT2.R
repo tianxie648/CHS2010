@@ -45,17 +45,17 @@ UT2 <- function(n,m,a,k,P,f,type = c( "normal", "lognormal", "exponential" )){
   eval.points   <- rbind(a,do.call(rbind,lapply(1:2, function(s) a+sqrt(n+k)*sqrt(P)[s,])),
                   do.call(rbind,lapply(1:2, function(s) a-sqrt(n+k)*sqrt(P)[s,])))
   # Evaluate the function at x_{l,t,t} for all l=1,...,N_\theta. Returns an (m*n) matrix.
-  f.eval.points <- apply(eval.points, 2, f)
+  f.eval.points <- apply(eval.points, 1, f)
   
   
   # Approximate a_{t+1,t}.
-  a.update  <- app.weights%*%f.eval.points
+  a.update  <- app.weights*t(f.eval.points)
   
   # Approximate Sigma_{t+1,t}. 
   # Step 1. Define the centered moments.
-  centered  <- apply(f.eval.points,1, function(s) s-a.update)
+  centered  <- t(f.eval.points)-a.update
   # Step 2. Create a list with all the elements in the summation
-  sigma.t.l <- lapply(1:m, function(s) app.weights[s]*centered[,s]%*%t(centered[,s]))
+  sigma.t.l <- lapply(1:m, function(s) app.weights[s]*centered[s,]%*%t(centered[s,]))
   # Sum them all using the definition on page 20 in the Appendix
   Sigma.update   <- Reduce(`+`,sigma.t.l) + H
 
