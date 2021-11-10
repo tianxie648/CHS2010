@@ -9,6 +9,7 @@
 #' @param P Matrix. Updated variance of the factor.
 #' @param f Function. Observe that \eqn{f: \mathbb{R}^{N_{\theta}}\to\mathbb{R}^{N_{\theta}}}. This is the integrated function, as in the form \eqn{\int f(\theta_t)\phi(\theta_t ; a, P)d\theta_t}.
 #' @param type String. The distribution of the error term in the transition equation (A6.1).
+#' @param ... Extra arguments passed to the function f.
 #' 
 #' @return List. A list containing a_{t+1,t} and Sigma_{t+1,t}.
 #' 
@@ -18,9 +19,13 @@
 #' @keywords Nonlinear Filtering Unscented Transform
 
 
-UT2 <- function(n,m,a,k,P,f,type = c( "normal", "lognormal", "exponential" )){
+UT2 <- function(n,m,a,k=2,P,f,
+                type = c( "normal", "lognormal", "exponential" ),...){
   
-  # Calculate covariance matrix H
+  # Calculate covariance matrix H. The main text assumes that
+  # innivations are normally distributed and serially independent
+  # across elements in \theta (e.g., equation 4.1), so H would be
+  # a diagonal matrix with unknown shock variances along the diagonal.
   type = match.arg( type )
   
   # generate Y0
