@@ -17,6 +17,7 @@
 #' @references 
 #' Supplement to "Estimating the Technology of Cognitive and Noncognitive Skill Formation": Appendix (Econometrica, Vol. 78, No.3, May 2010, 883-931)
 #' @keywords Nonlinear Filtering Unscented Transform
+#' @import expm
 
 
 UT2 <- function(n,m,a,k=2,P,f,
@@ -47,8 +48,8 @@ UT2 <- function(n,m,a,k=2,P,f,
   app.weights   <- c( k/(n+k), rep(1/(2*(n+k)),2*n) )
   # A matrix (m * n) of approximation points. Each column l, l=1,...,N_\theta, 
   # corresponds to x_{n,l,t,t} with n = 0,..., 2N_\theta.
-  eval.points   <- rbind(a,do.call(rbind,lapply(1:2, function(s) a+sqrt(n+k)*sqrt(P)[s,])),
-                  do.call(rbind,lapply(1:2, function(s) a-sqrt(n+k)*sqrt(P)[s,])))
+  eval.points   <- rbind(a,do.call(rbind,lapply(1:2, function(s) a+sqrt(n+k)*sqrtm(P)[s,])),
+                  do.call(rbind,lapply(1:2, function(s) a-sqrt(n+k)*sqrtm(P)[s,])))
   # Evaluate the function at x_{l,t,t} for all l=1,...,N_\theta. Returns an (m*n) matrix.
   f.eval.points <- apply(eval.points, 1, f)
   
