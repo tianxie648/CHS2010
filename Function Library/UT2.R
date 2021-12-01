@@ -19,58 +19,50 @@
 #' @import expm
 
 
-UT2 <- function(n,a,P,k=2,f="CES",h="linear",delta.eta=c(1,1),...){
+UT2 <- function(n,a,P,f="CES",h="linear",delta.eta=c(1,1),...){
   
-  # Approximation points. According to the appendix of CHS2010, m = 2*n + 1.
-  m <- 2*n+1
-  # Approximate weights, a vector of size m. Observe that the weights
-  # are the same for all the l elements in the mixture distribution.
-  app.weights   <- c( k/(n+k), rep(1/(2*(n+k)),2*n) )
-  # A matrix (m * n) of approximation points. Each column l, l=1,...,N_\theta, 
-  # corresponds to x_{n,l,t,t} with n = 0,..., 2N_\theta.
-  eval.points   <- rbind(a,do.call(rbind,lapply(1:2, function(s) a+sqrt(n+k)*sqrtm(P)[s,])),
-                  do.call(rbind,lapply(1:2, function(s) a-sqrt(n+k)*sqrtm(P)[s,])))
-  # Evaluate the function at x_{l,t,t} for all l=1,...,N_\theta. Returns an (m*n) matrix.
-  f.eval.points <- apply(eval.points, 1, f)
+  # Generate the Sigma points
+  SigmaPoints <- sigma.points(n,a,P,k=2)
+  # Evaluate the function at S_{i,t,t} for all i=0,...,2N_\theta. Returns an (m*n) matrix.
+  f.eval.points <- apply(SigmaPoints$Stt, 1, f)
   
   # -------------------------------------- #
-  # Approximate a_{t+1,t}.
-  a.update  <- app.weights%*%t(f.eval.points)
+  # Time Update (filter process). 
   
+  # Step 1. Update mean. This generates a_{t+1,t}.
+  a.update  <- SigmaPoints$wtt%*%t(f.eval.points)
   # -------------------------------------- #
-  # Approximate Sigma_{t+1,t}
-  # Step 1. Define the centered moments.
+  # Step 2. Update variance. This generates Sigma_{t+1,t}
+  # Step 2.a. Define the centered moments.
   centered  <- t(apply(f.eval.points, 2, function(s) s-t(a.update)))
-  # Step 2. Create a list with all the elements in the summation
-  sigma.t.l <- lapply(1:m, function(s) app.weights[s]*centered[s,]%*%t(centered[s,]))
-  # Sum them all using the definition on page 20 in the Appendix
+  # Step 2.b. Create a list with all the elements in the summation
+  sigma.t.l <- lapply(1:m, function(s) SigmaPoints$wtt[s]*centered[s,]%*%t(centered[s,]))
+  # Step 2c. Sum them all using the definition on page 20 in the Appendix
   Sigma.update   <- Reduce(`+`,sigma.t.l) + diag(c(delta.eta,rep(0,n-length(delta.eta))),ncol = n)
   
-  # -------------------------------------- #
+  # ------------------------------------------ #
+  # Measurement Update (update moments)
+  
   # Approximate E_t[ h(\theta_t+1) ]
   h.f.eval.points <- apply(f.eval.points, 1, h)
-  y.hat <- app.weights%*%t(h.f.eval.points)
-  
+  y.hat <- SigmaPoints$wtt%*%t(h.f.eval.points)
   # -------------------------------------- #
   # Approximate V_t[ h(\theta_t+1) ]
   centered.h  <- t(apply(h.eval.points, 2, function(s) s-t(y.hat)))
   # Step 2. Create a list with all the elements in the summation
-  V.h.t.list <- lapply(1:ncol(centered.h), function(s) app.weights[s]*centered.h[s,]%*%t(centered.h[s,]))
+  V.h.t.list <- lapply(1:ncol(centered.h), function(s) SigmaPoints$wtt[s]*centered.h[s,]%*%t(centered.h[s,]))
   # Sum them all using the definition on page 20 in the Appendix
   V.h.t   <- Reduce(`+`,V.h.t.list)
-  
   # -------------------------------------- #
   # Approximate Cov_t[ \theta_t,y_t ]
-  Cov.y.theta.list <- lapply(1:m, function(s) app.weights[s]*centered[s,]%*%t(centered.h[s,]))
+  Cov.y.theta.list <- lapply(1:m, function(s) SigmaPoints$wtt[s]*centered[s,]%*%t(centered.h[s,]))
   Cov.y.theta   <- Reduce(`+`,Cov.y.theta.list)
-  
   # -------------------------------------- #
   # Approximate V_t[ y_t+1 ]
   V.y.t <- V.h.t + H
-  
 
-  # Return a_{t+1,t} and Sigma_{t+1,t} as a list
-  object_results<-list() #Generates an empty list to collect all the required info
+  # Return moments
+  object_results<-list() 
   object_results$a <- a.update
   object_results$P <- Sigma.update
   object_results$y.hat <- y.hat
