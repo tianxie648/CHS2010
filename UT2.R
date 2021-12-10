@@ -6,7 +6,7 @@
 #' @param a Numeric. A column vector of updated mean of the factor.
 #' @param k Numeric. The parameter kappa in the unscented transform. This is set to 2 by default.
 #' @param P Matrix. Updated variance of the factor.
-#' @param f Function. Transition equation in the state space representation, equation (A6.1). Observe that \eqn{f: \mathbb{R}^{N_{\theta}}\to\mathbb{R}^{N_{\theta}}}. This is the integrated function, as in the form \eqn{\int f(\theta_t)\phi(\theta_t ; a, P)d\theta_t}.
+#' @param f Type of anchoring used in the production function. It admits three values: the default option, no anchoring ("no.anchor"), linear anchoring ("linear.anchor") and nonlinear anchoring ("nonlinear.anchor"). Thus, this argument selects a type of production technology \eqn{f} depending on the type, i.e. the transition equation in the state space representation, equation (A6.1). Observe that \eqn{f: \mathbb{R}^{N_{\theta}}\to\mathbb{R}^{N_{\theta}}}. This is the integrated function, as in the form \eqn{\int f(\theta_t)\phi(\theta_t ; a, P)d\theta_t}.
 #' @param h Function. Measurement equation in the state space representation, equation (A6.2). Observe that \eqn{h: \mathbb{R}^{N_{\theta}}\to\mathbb{R}^{N_{z}}}, where \eqn{N_z} is the dimension of the vector of observed variables, the measurements \eqn{Z_{a,k,t,j}}.
 #' @param ... Extra arguments passed to the functions f and h (e.g. latent factor parameters and elasticities).
 #' 
@@ -19,7 +19,7 @@
 #' @import expm
 
 
-UT2 <- function(n,a,P,f="CES",h="linear",delta.eta=c(1,1),...){
+UT2 <- function(n,a,P,f="no.anchor",h="linear",delta.eta=c(1,1),...){
   
   # Generate the Sigma points
   SigmaPoints <- sigma.points(n,a,P,k=2)
@@ -77,7 +77,7 @@ UT2 <- function(n,a,P,f="CES",h="linear",delta.eta=c(1,1),...){
 }
 
 
-"CES" <- function(theta,gamma=rep(1/length(theta),length(theta)),phi=c(.5,.5),delta.eta=c(1,1),stage=1){
+"no.anchor" <- function(theta,gamma=rep(1/length(theta),length(theta)),phi=c(.5,.5),delta.eta=c(1,1),stage=1){
   
   # This is the production technology in Equation (4.1) in CHS(2010).
   # The production function follows a CES specification. Generally speaking,
@@ -109,11 +109,52 @@ UT2 <- function(n,a,P,f="CES",h="linear",delta.eta=c(1,1),...){
   }
   
   # Updated latent factor according to transition equation ( CES )
-  theta.k <- lapply(1:2,function(s) (gamma%*%theta^(phi[s]))^(1/(phi[s]))*exp(rnorm(1,0,delta.eta[s])))
+  theta.k <- lapply(1:2,function(k) (gamma%*%theta^(phi[k]))^(1/(phi[k]))*exp(rnorm(1,0,delta.eta[k])))
   # Export results
   theta.update <- c(unlist(theta.k),theta[3:length(theta)])
   return(theta.update)
 }
+
+"linear.anchor" <- function(theta,gamma=rep(1/length(theta),length(theta)),phi=c(.5,.5),delta.eta=c(1,1),stage=1, alpha4=c(1,1,1)){
+  
+  # This is the production technology in Equation (4.1) in CHS(2010).
+  # The main difference with respect to the "no.anchor" case is that
+  # now the production technology takes as inputs the transformed 
+  # skills, where the transformation is precisely the linear anchor.
+  # For this reason, there is only one new argument in the function,
+  # denoted alpha4. See function "no.anchor" for the full documentation.
+  
+  # alpha4      Factor loadings associated with the stocks of cognitive and 
+  #             non-cognitive skills for outcome j. Thus, alpha4 would vary
+  #             for each outcome Z_{4,j} of interest. Examples of outcomes
+  #             include high school graduation, criminal activity, drug use, 
+  #             and teenage pregnancy. In here, we assume there is only one 
+  #             outcome of interest so alpha4 is a 3-dimensional vector whose
+  #             elements are mu_{4,1}, alpha_{4,C,1}, and alpha_{4,N,1}. If
+  #             the outcome of interest varies, so does alpha4. See Sections
+  #             3.5 in CHS(2010) and Appendix A7.1 and A7.2 in CHS(2010, App)
+
+  
+  # The weights gamma must satisfy some restrictions.
+  # Checking the weights are between [0,1] and add up to 1.
+  if( !( sum(gamma)==1 & all(gamma>=0) & all(gamma<=1)) ){
+    print("Factor coefficients must be in the [0,1] interval and add up to one.")
+    stop()
+  }
+  # Transform the latent factors
+  
+  theta.star <- c(exp(alpha4[1]+alpha4[2]*log(theta[1])),
+                  exp(alpha4[1]+alpha4[3]*log(theta[2])),
+                  theta[-(1:2)])
+  
+  # Updated latent factor according to transition equation ( CES )
+  theta.k <- lapply(1:2,function(k) -alpha4[1]/alpha4[(s+1)]+(1/alpha4[(s+1)])*(gamma%*%theta.star^(phi[k]))^(1/(phi[k]))*exp(rnorm(1,0,delta.eta[k])))
+  # Export results
+  theta.update <- c(unlist(theta.k),theta[3:length(theta)])
+  return(theta.update)
+}
+
+
 
 
 "linear" <- function(theta,factor.loadings=rep(1,length(theta)),M=c(2,2,2,2,2,2),Z.mean=rep(0,length(theta))){
