@@ -37,20 +37,20 @@ stage.t <- function(t){
 }
 
 
-gen.data <- function(phi, gamma, delta.eta, T=8, N=2200, M = 20, miu, alpha, lambda, n.stage = 2, rn.seed){
+gen.data <- function(phi, gamma, delta.eta, Time=8, N=2200, M = 20, miu, alpha, lambda, n.stage = 2, rn.seed){
   
   # ----------------------------------------------------- #
   # Generate parental skills and investments, from arbitrary distributions
   set.seed(rn.seed)
   theta.CP <- exp(rnorm(N))
   theta.NP <- exp(rnorm(N))
-  Invest.t <- exp(matrix(rnorm(N*T), nrow = N))
+  Invest.t <- exp(matrix(rnorm(N*Time), nrow = N))
   # ------------------------- #
   # Generate children's skills
   # Note: the initial skills are 1
-  child.skill <- lapply(1:T, function(x) matrix(1, nrow = N, ncol = 2))
+  child.skill <- lapply(1:Time, function(x) matrix(1, nrow = N, ncol = 2))
   
-  for (t in 1:(T-1)){
+  for (t in 1:(Time-1)){
     stage       <- stage.t(t)
     phi.s       <- phi[,,stage]
     gamma.s     <- gamma[,,stage]
@@ -79,10 +79,10 @@ gen.data <- function(phi, gamma, delta.eta, T=8, N=2200, M = 20, miu, alpha, lam
   alpha.1 <- alpha[[1]]
   alpha.2 <- alpha[[2]]
   
-  Z.1.C <- lapply(1:T, function(t) miu.1[,1,t,] + alpha.1[,1,t,] * log(child.skill[[t]][,1]) + matrix(rnorm(N*M,mean = 0, sd = lambda),ncol = M))
-  Z.1.N <- lapply(1:T, function(t) miu.1[,2,t,] + alpha.1[,2,t,] * log(child.skill[[t]][,2]) + matrix(rnorm(N*M,mean = 0, sd = lambda),ncol = M))
-  Z.2   <- lapply(1:T, function(t) miu.2[,1,t,] + alpha.2[,1,t,] * log(Invest.t[,t]) + matrix(rnorm(N*M,mean = 0, sd = lambda),ncol = M))
-  
+  Z.1.C <- lapply(1:Time, function(t) miu.1[,1,t,] + alpha.1[,1,t,] * log(child.skill[[t]][,1]) + matrix(rnorm(N*M,mean = 0, sd = lambda),ncol = M))
+  Z.1.N <- lapply(1:Time, function(t) miu.1[,2,t,] + alpha.1[,2,t,] * log(child.skill[[t]][,2]) + matrix(rnorm(N*M,mean = 0, sd = lambda),ncol = M))
+  Z.2   <- lapply(1:Time, function(t) miu.2[,1,t,] + alpha.2[,1,t,] * log(Invest.t[,t]) + matrix(rnorm(N*M,mean = 0, sd = lambda),ncol = M))
+
   Z.1.C <- matrix(unlist(Z.1.C), nrow = N)
   Z.1.N <- matrix(unlist(Z.1.N), nrow = N)
   Z.2   <- matrix(unlist(Z.2), nrow = N)
