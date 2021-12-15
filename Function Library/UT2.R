@@ -77,7 +77,7 @@ UT2 <- function(n,a,P,f="no.anchor",h="linear",delta.eta=c(1,1),...){
 }
 
 
-"no.anchor" <- function(theta,gamma=rep(1/length(theta),length(theta)),phi=c(.5,.5),delta.eta=c(1,1),stage=1){
+"no.anchor" <- function(theta,gamma,phi=c(.5,.5),delta.eta=c(1,1),stage=n.stage){
   
   # This is the production technology in Equation (4.1) in CHS(2010).
   # The production function follows a CES specification. Generally speaking,
@@ -103,19 +103,24 @@ UT2 <- function(n,a,P,f="no.anchor",h="linear",delta.eta=c(1,1),...){
   
   # The weights gamma must satisfy some restrictions.
   # Checking the weights are between [0,1] and add up to 1.
-  if( !( sum(gamma)==1 & all(gamma>=0) & all(gamma<=1)) ){
-    print("Factor coefficients must be in the [0,1] interval and add up to one.")
-    stop()
+  for (i in 1:stage) {
+    for (k in 1:2) {
+      if( !( sum(gamma[k,,i])==1 & all(gamma[k,,i]>=0) & all(gamma[k,,i]<=1)) ){
+        print("Factor coefficients must be in the [0,1] interval and add up to one.")
+        stop()
+      }
+    }
   }
   
   # Updated latent factor according to transition equation ( CES )
-  theta.k <- lapply(1:2,function(k) (gamma%*%theta^(phi[k]))^(1/(phi[k]))*exp(rnorm(1,0,delta.eta[k])))
+  
+  theta.k <- lapply(1:2,function(k) (gamma[k,,stage]%*%theta^(phi[k]))^(1/(phi[k]))*exp(rnorm(1,0,delta.eta[k])))
   # Export results
   theta.update <- c(unlist(theta.k),theta[3:length(theta)])
   return(theta.update)
 }
 
-"linear.anchor" <- function(theta,gamma=rep(1/length(theta),length(theta)),phi=c(.5,.5),delta.eta=c(1,1),stage=1, alpha4=c(1,1,1)){
+"linear.anchor" <- function(theta,gamma,phi=c(.5,.5),delta.eta=c(1,1),stage=n.stage, alpha4=c(1,1,1)){
   
   # This is the production technology in Equation (4.1) in CHS(2010).
   # The main difference with respect to the "no.anchor" case is that
@@ -137,10 +142,15 @@ UT2 <- function(n,a,P,f="no.anchor",h="linear",delta.eta=c(1,1),...){
   
   # The weights gamma must satisfy some restrictions.
   # Checking the weights are between [0,1] and add up to 1.
-  if( !( sum(gamma)==1 & all(gamma>=0) & all(gamma<=1)) ){
-    print("Factor coefficients must be in the [0,1] interval and add up to one.")
-    stop()
+  for (i in 1:stage) {
+    for (k in 1:2) {
+      if( !( sum(gamma[k,,i])==1 & all(gamma[k,,i]>=0) & all(gamma[k,,i]<=1)) ){
+        print("Factor coefficients must be in the [0,1] interval and add up to one.")
+        stop()
+      }
+    }
   }
+  
   # Transform the latent factors
   
   theta.star <- c(exp(alpha4[1]+alpha4[2]*log(theta[1])),
@@ -148,13 +158,46 @@ UT2 <- function(n,a,P,f="no.anchor",h="linear",delta.eta=c(1,1),...){
                   theta[-(1:2)])
   
   # Updated latent factor according to transition equation ( CES )
-  theta.k <- lapply(1:2,function(k) -alpha4[1]/alpha4[(s+1)]+(1/alpha4[(s+1)])*(gamma%*%theta.star^(phi[k]))^(1/(phi[k]))*exp(rnorm(1,0,delta.eta[k])))
+  theta.k <- lapply(1:2,function(k) -alpha4[1]/alpha4[(s+1)]+(1/alpha4[(s+1)])*(gamma[k,,stage]%*%theta.star^(phi[k]))^(1/(phi[k]))*exp(rnorm(1,0,delta.eta[k])))
   # Export results
   theta.update <- c(unlist(theta.k),theta[3:length(theta)])
   return(theta.update)
 }
 
-
+"nonlinear.anchor" <- function(theta,gamma=rep(1/length(theta),length(theta)),phi=c(.5,.5),delta.eta=c(1,1),stage=1, alpha4=c(1,1,1)){
+  
+  # This is the production technology in Equation (4.1) in CHS(2010).
+  # The main difference with respect to the "no.anchor" case is that
+  # now the production technology takes as inputs the transformed 
+  # skills, where the transformation is precisely the linear anchor.
+  # For this reason, there is only one new argument in the function,
+  # denoted alpha4. See function "no.anchor" for the full documentation.
+  
+  # alpha4      Factor loadings associated with the stocks of cognitive and 
+  #             non-cognitive skills for outcome j. Thus, alpha4 would vary
+  #             for each outcome Z_{4,j} of interest. Examples of outcomes
+  #             include high school graduation, criminal activity, drug use, 
+  #             and teenage pregnancy. In here, we assume there is only one 
+  #             outcome of interest so alpha4 is a 3-dimensional vector whose
+  #             elements are mu_{4,1}, alpha_{4,C,1}, and alpha_{4,N,1}. If
+  #             the outcome of interest varies, so does alpha4. See Sections
+  #             3.5 in CHS(2010) and Appendix A7.1 and A7.2 in CHS(2010, App)
+  
+  
+  # The weights gamma must satisfy some restrictions.
+  # Checking the weights are between [0,1] and add up to 1.
+  if( !( sum(gamma)==1 & all(gamma>=0) & all(gamma<=1)) ){
+    print("Factor coefficients must be in the [0,1] interval and add up to one.")
+    stop()
+  }
+  # Transform the latent factors
+  
+  # Updated latent factor according to transition equation ( CES )
+  theta.k <- lapply(1:2,function(k) (gamma%*%theta^(phi[k]))^(1/(phi[k]))*exp(rnorm(1,0,delta.eta[k])))
+  # Export results
+  theta.update <- c(unlist(theta.k),theta[3:length(theta)])
+  return(theta.update)
+}
 
 
 "linear" <- function(theta,factor.loadings=rep(1,length(theta)),M=c(2,2,2,2,2,2),Z.mean=rep(0,length(theta))){
