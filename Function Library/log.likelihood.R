@@ -39,7 +39,7 @@ log.likelihood <- function(gamma,phi,delta.eta,Z,a0,P0,...){
   
   # -------------------------------------------------------------- #
   # Initial conditions
-  moments <- UT2(N.theta,a0,P0,f="CES",h="linear",delta.eta=delta.eta,gamma=gamma,phi=phi)
+  moments <- UT2(N.theta,a0,P0,f="no.anchor",h="linear",delta.eta=delta.eta,gamma=gamma,phi=phi)
   
   for (t in 1:T.sample) {
     
@@ -53,7 +53,7 @@ log.likelihood <- function(gamma,phi,delta.eta,Z,a0,P0,...){
     aa[t,]  <- moments$`a_t+1|t`+moments$`Cov_t[ theta_t,y_t]`%*%F.inverse[t,,](pred.error[t,])
     PP[t,,] <- moments$`P_t+1|t`-moments$`Cov_t[ theta_t,y_t]`%*%F.inverse[t,,]%*%t(moments$`Cov_t[ theta_t,y_t]`)
     # Prediction recursions
-    moments <- UT2(N.theta,aa[t,],PP[t,,],f="CES",h="linear",delta.eta=delta.eta,gamma=gamma,phi=phi)
+    moments <- UT2(N.theta,aa[t,],PP[t,,],f="no.anchor",h="linear",delta.eta=delta.eta,gamma=gamma,phi=phi)
     
   }
   
