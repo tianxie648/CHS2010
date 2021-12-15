@@ -2,17 +2,17 @@
 #' 
 #' @description Generate Monte Carlo simulations as in 4.1 (CHS2010).
 #' 
-#' @param phi         Array. 2x1xn.stage numeric. The parameter in the production function in (4,1) (CHS2010)
-#' @param gamma       Array. 2x5xn.stage numeric. The coefficient in the production function in (4.1) (CHS2010)
-#' @param delta.eta   Array. 1x1xn.stage numeric. The standard deviation in the production function in (4,1) (CHS2010)
+#' @param phi         Numeric array of dimension 2x1xn.stages. The parameter in the production function in (4.1) (CHS2010)
+#' @param gamma       Numeric array of dimension 2x5xn.stages. The coefficient in the production function in (4.1) (CHS2010)
+#' @param delta.eta   Numeric array of dimension 1x1xn.stages. The standard deviation in the production function in (4,1) (CHS2010). Observe that we allow the variance to change between stages but not across skills.
 #' @param Time        Integer. Number of time periods.
 #' @param N           Integer. Number of individuals.
 #' @param M           Integer. Number of measurements. Assume the number of all measurements is the same 20.
-#' @param miu         List of 3. The first element is a Nx2xTxM array, the \miu in (3.1). The second element is a Nx1xTxM array, the \miu in (3.2). The third element is a Nx2xM array, the \miu in (3.3). 
-#' @param alpha       List of 3. (No normalization in simulations) The first element is a Nx2xTxM array, the \alpha in (3.1). The second element is a Nx1xTxM array, the \alpha in (3.2). The third element is a Nx2xM array, the \alpha in (3.3).
-#' @param lambda      Numeric. The square root of diagonal entries of \Lambda in Page 905. Assumed to be the same across all measurements.
-#' @param n.stage     Integer. Number of stages.  
-#' @param rn.seed     Integer. Random seed.
+#' @param miu         List of 3. The first element is a Nx2xTxM array, the \eqn{\miu} in (3.1). The second element is a Nx1xTxM array, the \eqn{\miu} in (3.2). The third element is a Nx2xM array, the \miu in (3.3). 
+#' @param alpha       List of 3. (No normalization in simulations) The first element is a Nx2xTxM array, the \eqn{\alpha} in (3.1). The second element is a Nx1xTxM array, the \eqn{\alpha} in (3.2); observe that we implicitly assumed the \eqn{alpha_2} is the same for \eqn{k=C,N} because families invest on these skills equally. The third element is a Nx2xM array, the \eqn{\alpha} in (3.3).
+#' @param lambda      Numeric. The square root of diagonal entries of \eqn{\Lambda} in Page 905. Assumed to be the same across all measurements.
+#' @param n.stage     Integer. Number of stages in childhood development.
+#' @param rn.seed     Integer.Seed for the random number generator.
 #' 
 #' @return Data frame. A data frame of simulated data.
 #' 
