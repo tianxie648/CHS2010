@@ -8,7 +8,7 @@
 #' @param Time        Integer. Number of time periods.
 #' @param N           Integer. Number of individuals.
 #' @param M           Integer. Number of measurements. Assume the number of all measurements is the same 20.
-#' @param miu         List of 3. The first element is a Nx2xTxM array, the \eqn{\miu} in (3.1). The second element is a Nx1xTxM array, the \eqn{\miu} in (3.2). The third element is a Nx2xM array, the \miu in (3.3). 
+#' @param miu         List of 3. The first element is a Nx2xTxM array, the \eqn{\miu} in (3.1). The second element is a Nx1xTxM array, the \eqn{\miu} in (3.2). The third element is a Nx2xM array, the \eqn{\miu} in (3.3). 
 #' @param alpha       List of 3. (No normalization in simulations) The first element is a Nx2xTxM array, the \eqn{\alpha} in (3.1). The second element is a Nx1xTxM array, the \eqn{\alpha} in (3.2); observe that we implicitly assumed the \eqn{alpha_2} is the same for \eqn{k=C,N} because families invest on these skills equally. The third element is a Nx2xM array, the \eqn{\alpha} in (3.3).
 #' @param lambda      Numeric. The square root of diagonal entries of \eqn{\Lambda} in Page 905. Assumed to be the same across all measurements.
 #' @param n.stage     Integer. Number of stages in childhood development.
@@ -73,7 +73,7 @@ gen.data <- function(phi, gamma, delta.eta, Time=8, N=2200, M = 20, miu, alpha, 
   Z.3.N <- miu.3[,2,] + alpha.3[,2,] * log(theta.NP) + matrix(rnorm(N*M,mean = 0, sd = lambda),ncol = M)
   # ---------------------------------------- #
   # Generate measurements of investments and children's skills
-  # Note: Variance of errors are sssumed to be the same across all measurements
+  # Note: Variance of errors are asssumed to be the same across all measurements
   miu.1   <- miu[[1]]
   miu.2   <- miu[[2]]
   alpha.1 <- alpha[[1]]
@@ -83,6 +83,11 @@ gen.data <- function(phi, gamma, delta.eta, Time=8, N=2200, M = 20, miu, alpha, 
   Z.1.N <- lapply(1:Time, function(t) miu.1[,2,t,] + alpha.1[,2,t,] * log(child.skill[[t]][,2]) + matrix(rnorm(N*M,mean = 0, sd = lambda),ncol = M))
   Z.2   <- lapply(1:Time, function(t) miu.2[,1,t,] + alpha.2[,1,t,] * log(Invest.t[,t]) + matrix(rnorm(N*M,mean = 0, sd = lambda),ncol = M))
 
+  # The following step exports the results as vectors. We note that
+  # the next objects are matrices with N rows and Time*M columns.
+  # However, the order matters. For example, the first two columns
+  # of Z.1.C are two measurements for the stock of cognitive skill
+  # in time t=1. Therefore, it's ordered in pairs: for each t, m=1,...M.
   Z.1.C <- matrix(unlist(Z.1.C), nrow = N)
   Z.1.N <- matrix(unlist(Z.1.N), nrow = N)
   Z.2   <- matrix(unlist(Z.2), nrow = N)
