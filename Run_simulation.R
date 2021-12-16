@@ -65,7 +65,7 @@ for (i in 1:n.sim){
                   alpha     = alpha, 
                   lambda    = lambda, 
                   n.stage   = S, 
-                  rn.seed   = i)
+                  rn.seed   = i)[[1]]
  
  
  #my.outcome[[i]] <- unname(colMeans(fake))
@@ -74,6 +74,17 @@ for (i in 1:n.sim){
 #' Unlist and generate a matrix of means
 #' Each column represents means of each simulation
 mean.matrix <- matrix(unlist(my.outcome), ncol = n.sim)
+
+
+
+#' 
+
+
+
+
+
+
+
 
 
 

@@ -7,14 +7,14 @@
 #' @param delta.eta   Numeric array of dimension 1x1xn.stages. The standard deviation in the production function in (4,1) (CHS2010). Observe that we allow the variance to change between stages but not across skills.
 #' @param Time        Integer. Number of time periods.
 #' @param N           Integer. Number of individuals.
-#' @param M           Integer. Number of measurements. Assume the number of all measurements is the same 20.
+#' @param M           Numeric matrix of dimension 5xTime. The number of measurements for each factor at each period. Each column of the matrix represents each period. Each row is by order: Child Cognitive, Child Noncognitive, Investment, Parental Cognitive, Parental Noncognitive
 #' @param miu         List of 3. The first element is a Nx2xTxM array, the \eqn{\miu} in (3.1). The second element is a Nx1xTxM array, the \eqn{\miu} in (3.2). The third element is a Nx2xM array, the \eqn{\miu} in (3.3). 
 #' @param alpha       List of 3. (No normalization in simulations) The first element is a Nx2xTxM array, the \eqn{\alpha} in (3.1). The second element is a Nx1xTxM array, the \eqn{\alpha} in (3.2); observe that we implicitly assumed the \eqn{alpha_2} is the same for \eqn{k=C,N} because families invest on these skills equally. The third element is a Nx2xM array, the \eqn{\alpha} in (3.3).
 #' @param lambda      Numeric. The square root of diagonal entries of \eqn{\Lambda} in Page 905. Assumed to be the same across all measurements.
 #' @param n.stage     Integer. Number of stages in childhood development.
 #' @param rn.seed     Integer.Seed for the random number generator.
 #' 
-#' @return Data frame. A data frame of simulated data.
+#' @return List. A list of simulated data.
 #' 
 #' @author
 #' @references 
@@ -88,13 +88,14 @@ gen.data <- function(phi, gamma, delta.eta, Time=8, N=2200, M = 20, miu, alpha, 
   # However, the order matters. For example, the first two columns
   # of Z.1.C are two measurements for the stock of cognitive skill
   # in time t=1. Therefore, it's ordered in pairs: for each t, m=1,...M.
-  Z.1.C <- matrix(unlist(Z.1.C), nrow = N)
-  Z.1.N <- matrix(unlist(Z.1.N), nrow = N)
-  Z.2   <- matrix(unlist(Z.2), nrow = N)
+  Z.1.C.M <- matrix(unlist(Z.1.C), nrow = N)
+  Z.1.N.M <- matrix(unlist(Z.1.N), nrow = N)
+  Z.2.M   <- matrix(unlist(Z.2), nrow = N)
   
   # -------------------------------------- #
   #Generate the data frame
-  result <- data.frame(Z.1.C, Z.1.N, Z.2, Z.3.C, Z.3.N)
+  dat <- data.frame(Z.1.C.M, Z.1.N.M, Z.2.M, Z.3.C, Z.3.N)
+  result <- list(dat, Z.1.C, Z.1.N, Z.2, Z.3.C, Z.3.N)
   return(result)
 }
 
