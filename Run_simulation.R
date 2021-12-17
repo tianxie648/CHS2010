@@ -20,7 +20,7 @@ date()
 # Load Packages
 pkg<-list("numDeriv")
 lapply(pkg, require, character.only=T)
-functions<-list("Simulation2.R")
+functions<-list("Simulation2.R","Reshape.R")
 lapply(functions, source)
 rm(pkg,functions)
 #source('D:/Onedrive - University College London/CHS2010/Simulation2.R')
