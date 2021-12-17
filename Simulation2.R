@@ -8,8 +8,8 @@
 #' @param Time        Integer. Number of time periods.
 #' @param N           Integer. Number of individuals.
 #' @param M           Numeric matrix of dimension 5xTime. The number of measurements for each factor at each period. Each column of the matrix represents each period. Each row is by order: Child Cognitive, Child Noncognitive, Investment, Parental Cognitive, Parental Noncognitive
-#' @param miu         List of 3. The first element is a Nx2xTxM array, the \eqn{\miu} in (3.1). The second element is a Nx1xTxM array, the \eqn{\miu} in (3.2). The third element is a Nx2xM array, the \eqn{\miu} in (3.3). 
-#' @param alpha       List of 3. (No normalization in simulations) The first element is a Nx2xTxM array, the \eqn{\alpha} in (3.1). The second element is a Nx1xTxM array, the \eqn{\alpha} in (3.2); observe that we implicitly assumed the \eqn{alpha_2} is the same for \eqn{k=C,N} because families invest on these skills equally. The third element is a Nx2xM array, the \eqn{\alpha} in (3.3).
+#' @param miu         Numeric. \eqn{\miu} in (3.1)-(3.3). Assumed to be the same across all measurements 
+#' @param alpha       Numeric. (No normalization in simulations) The \eqn{\alpha} in (3.1) - (3.3). Assumed to be the same across all measurements.
 #' @param lambda      Numeric. The square root of diagonal entries of \eqn{\Lambda} in Page 905. Assumed to be the same across all measurements.
 #' @param n.stage     Integer. Number of stages in childhood development.
 #' @param rn.seed     Integer.Seed for the random number generator.
@@ -37,7 +37,7 @@ stage.t <- function(t){
 }
 
 
-gen.data <- function(phi, gamma, delta.eta, Time=8, N=2200, M = 20, miu, alpha, lambda, n.stage = 2, rn.seed){
+gen.data <- function(phi, gamma, delta.eta, Time=8, N=2200, M, miu, alpha, lambda, n.stage = 2, rn.seed){
   
   # ----------------------------------------------------- #
   # Generate parental skills and investments, from arbitrary distributions
@@ -66,22 +66,22 @@ gen.data <- function(phi, gamma, delta.eta, Time=8, N=2200, M = 20, miu, alpha, 
   # ------------------------------------------ #
   # Generate measurements of patental skills
   # Note: Variance of errors are sssumed to be the same across all measurements
-  miu.3   <- miu[[3]]
-  alpha.3 <- alpha[[3]]
+  miu.3   <- miu
+  alpha.3 <- alpha
   
-  Z.3.C <- miu.3[,1,] + alpha.3[,1,] * log(theta.CP) + matrix(rnorm(N*M,mean = 0, sd = lambda),ncol = M)
-  Z.3.N <- miu.3[,2,] + alpha.3[,2,] * log(theta.NP) + matrix(rnorm(N*M,mean = 0, sd = lambda),ncol = M)
+  Z.3.C <- miu.3 + alpha.3 * log(theta.CP) + matrix(rnorm(N*M[4,1],mean = 0, sd = lambda),ncol = M[4,1])
+  Z.3.N <- miu.3 + alpha.3 * log(theta.NP) + matrix(rnorm(N*M[5,1],mean = 0, sd = lambda),ncol = M[5,1])
   # ---------------------------------------- #
   # Generate measurements of investments and children's skills
   # Note: Variance of errors are asssumed to be the same across all measurements
-  miu.1   <- miu[[1]]
-  miu.2   <- miu[[2]]
-  alpha.1 <- alpha[[1]]
-  alpha.2 <- alpha[[2]]
+  miu.1   <- miu
+  miu.2   <- miu
+  alpha.1 <- alpha
+  alpha.2 <- alpha
   
-  Z.1.C <- lapply(1:Time, function(t) miu.1[,1,t,] + alpha.1[,1,t,] * log(child.skill[[t]][,1]) + matrix(rnorm(N*M,mean = 0, sd = lambda),ncol = M))
-  Z.1.N <- lapply(1:Time, function(t) miu.1[,2,t,] + alpha.1[,2,t,] * log(child.skill[[t]][,2]) + matrix(rnorm(N*M,mean = 0, sd = lambda),ncol = M))
-  Z.2   <- lapply(1:Time, function(t) miu.2[,1,t,] + alpha.2[,1,t,] * log(Invest.t[,t]) + matrix(rnorm(N*M,mean = 0, sd = lambda),ncol = M))
+  Z.1.C <- lapply(1:Time, function(t) miu.1 + alpha.1 * log(child.skill[[t]][,1]) + matrix(rnorm(N*M[1,t],mean = 0, sd = lambda),ncol = M[1,t]))
+  Z.1.N <- lapply(1:Time, function(t) miu.1 + alpha.1 * log(child.skill[[t]][,2]) + matrix(rnorm(N*M[2,t],mean = 0, sd = lambda),ncol = M[2,t]))
+  Z.2   <- lapply(1:Time, function(t) miu.2 + alpha.2 * log(Invest.t[,t]) + matrix(rnorm(N*M[3,t],mean = 0, sd = lambda),ncol = M[3,t]))
 
   # The following step exports the results as vectors. We note that
   # the next objects are matrices with N rows and Time*M columns.
