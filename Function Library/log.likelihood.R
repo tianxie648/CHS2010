@@ -42,13 +42,13 @@ log.likelihood <- function(gamma,phi,delta.eta,Z,Time,a0,P0,...){
   # Initial conditions
   moments <- UT2(N.theta,a0,P0,f="no.anchor",h="linear",delta.eta=delta.eta,gamma=gamma,phi=phi)
   
-  for (t in 1:N.Sample) {
+  for (t in 1:Time) {
     
     # Prediction errors
     pred.error[t,] <- Z[t,]-moments$`y.hat_t`
-    F.inverse[t,,] <- solve(moments$`V_t[g(theta_t+1)]`+H)
+    F.inverse[t,,] <- solve(moments$`V_t[h(theta_t+1)]`+H)
     # Arguments for the Schweppe Decomposition of the likelihood function
-    log.det[t]  <- log(det(moments$`V_t[g(theta_t+1)]`+H))
+    log.det[t]  <- log(det(moments$`V_t[h(theta_t+1)]`+H))
     weighted.error[t] <- pred.error[t,]%*%determ.t[t]%*%t(pred.error[t,])
     # Update recursions
     aa[t,]  <- moments$`a_t+1|t`+moments$`Cov_t[ theta_t,y_t]`%*%F.inverse[t,,](pred.error[t,])
