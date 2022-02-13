@@ -3,6 +3,7 @@
 #' @description Compute the integration (e.g. mean and variance) with a monomial rule as in Appendix A6 (CHS2010).
 #' 
 #' @param n Integer. The dimension of integrated variable, i.e. number of latent factors \eqn{\theta_t}.
+#' @param M Numeric. matrix of dimension 5xTime. The number of measurements for each factor at each period. Each column of the matrix represents each period. Each row is by order: Child Cognitive, Child Noncognitive, Investment, Parental Cognitive, Parental Noncognitive
 #' @param a Numeric. A column vector of updated mean of the factor.
 #' @param k Numeric. The parameter kappa in the unscented transform. This is set to 2 by default.
 #' @param P Matrix. Updated variance of the factor.
@@ -19,7 +20,7 @@
 #' @import expm
 
 
-UT2 <- function(n,a,P,f="no.anchor",h="linear",delta.eta=c(1,1),...){
+UT2 <- function(n,M,a,P,f="no.anchor",h="linear",delta.eta=c(1,1),...){
   
   # Generate the Sigma points
   SigmaPoints <- sigma.points(n,a,P,k=2)
@@ -200,7 +201,7 @@ UT2 <- function(n,a,P,f="no.anchor",h="linear",delta.eta=c(1,1),...){
 }
 
 
-"linear" <- function(theta,factor.loadings=rep(1,length(theta)),M=c(2,2,2,2,2,2),Z.mean=rep(0,length(theta))){
+"linear" <- function(theta,factor.loadings=rep(1,length(theta)),M,Z.mean=rep(0,length(theta))){
   
   # This corresponds to the measurement equations in equations
   # (3.1) - (3.3). It is a linear function and corresponds with 
@@ -223,10 +224,10 @@ UT2 <- function(n,a,P,f="no.anchor",h="linear",delta.eta=c(1,1),...){
   #                  The order matters: the first M_ak entries correspond with
   #                  latent factor a=1,2,3 and skill k=C,N
   # M                The number of measurements that indicate when the cutoff of 
-  #                  indeces in factor.loadings are. It's a vector of size 6 because
-  #                  there are six latent factors. For example, if M[5]=8 it means
-  #                  that parental cognitive endowment, Z_{3,C}, has j=8 measurements.
-  #                  The default indicates that we have 2 measurements for each Z_a,k.
+  #                  indeces in factor.loadings are. Matrix of dimension 5xTime. 
+  #                  Each column of the matrix represents each period. Each row 
+  #                  is by order: Child Cognitive, Child Noncognitive, Investment, 
+  #                  Parental Cognitive, Parental Noncognitive
   # Z.mean           Mean vector with the mean of each Z_{a,k,t,j}.
   
   # Measurements for teacher assesment of child cognitive skills

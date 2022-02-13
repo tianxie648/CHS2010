@@ -4,6 +4,7 @@
 #' 
 #' @param Z         List. The first object is the matrix of observed data. Each row represents an individual. The rest objects are Z.1.C.M, Z.1.N.M, Z.2.M, Z.3.C, Z.3.N.
 #' @param Time      Integer. Number of time periods. 
+#' @param M         Numeric. matrix of dimension 5xTime. The number of measurements for each factor at each period. Each column of the matrix represents each period. Each row is by order: Child Cognitive, Child Noncognitive, Investment, Parental Cognitive, Parental Noncognitive
 #' @param a0        Numeric. Vector of initial conditions corresponding to \eqn{\mathbb{E}_0(\theta_0)}. 
 #' @param P0        Numeric. Matrix of initial conditions corresponding to \eqn{\mathbb{V}_0(\theta_0)}.
 #' @param gamma     Numeric. Vector of size \eqn{N_\theta} with latent factor coefficients \eqn{\gamma_1,k,s,\dots,\gamma_5,k,s}, for \eqn{k\in\{C,N\}}. The vector must satisfy \eqn{\gamma_{j,k,s}\ge0} and \eqn{\sum_j \gamma_{j,k,s}=1}.
@@ -21,7 +22,7 @@
 #' 
 
 
-log.likelihood <- function(gamma,phi,delta.eta,Z,Time,a0,P0,...){
+log.likelihood <- function(gamma,phi,delta.eta,Z,Time,M,a0,P0,...){
   
   # ----------------------------------- #
   # Define the dimensions of parameters
