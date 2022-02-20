@@ -21,7 +21,7 @@
 #' @import expm
 
 
-UT2 <- function(n,t,M,a,P,f="no.anchor",h="linear",delta.eta=c(1,1),...){
+UT2 <- function(n,t,M,a,P,f="no.anchor",h="linear",delta.eta,gamma,phi,...){
   
   # Generate stage
   stage <- 1 + as.numeric(t>4)
@@ -82,7 +82,7 @@ UT2 <- function(n,t,M,a,P,f="no.anchor",h="linear",delta.eta=c(1,1),...){
 }
 
 
-"no.anchor" <- function(theta,gamma,phi=c(.5,.5),delta.eta=c(1,1),stage,n.stage=2){
+"no.anchor" <- function(theta,gamma,phi,delta.eta,stage,n.stage=2){
   
   # This is the production technology in Equation (4.1) in CHS(2010).
   # The production function follows a CES specification. Generally speaking,
@@ -119,7 +119,7 @@ UT2 <- function(n,t,M,a,P,f="no.anchor",h="linear",delta.eta=c(1,1),...){
   
   # Updated latent factor according to transition equation ( CES )
   
-  theta.k <- lapply(1:2,function(k) (gamma[k,,stage]%*%theta^(phi[k]))^(1/(phi[k]))*exp(rnorm(1,0,delta.eta[k])))
+  theta.k <- lapply(1:2,function(k) (gamma[k,,stage]%*%theta^(phi[k,1,stage]))^(1/(phi[k,1,stage]))*exp(rnorm(1,0,delta.eta[1,1,stage])))
   # Export results
   theta.update <- c(unlist(theta.k),theta[3:length(theta)])
   return(theta.update)
