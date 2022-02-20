@@ -28,8 +28,9 @@ UT2 <- function(n,t,M,a,P,f="no.anchor",h="linear",delta.eta,gamma,phi,...){
   
   # Generate the Sigma points
   SigmaPoints <- sigma.points(n,a,P,k=2)
+  m <- 2*n + 1
   # Evaluate the function at S_{i,t,t} for all i=0,...,2N_\theta. Returns an (m*n) matrix.
-  f.eval.points <- apply(SigmaPoints$Stt, 1, f)
+  f.eval.points <- apply(SigmaPoints$Stt, 1,function(s) f(s,gamma,phi,delta.eta,stage))
   
   # -------------------------------------- #
   # Time Update (filter process). 
@@ -49,7 +50,7 @@ UT2 <- function(n,t,M,a,P,f="no.anchor",h="linear",delta.eta,gamma,phi,...){
   # Measurement Update (update moments)
   
   # Approximate E_t[ h(\theta_t+1) ]
-  h.f.eval.points <- apply(f.eval.points, 1, h)
+  h.f.eval.points <- apply(f.eval.points, 1, function(s) h(s,factor.loadings=rep(1,length(s)),M,t,Z.mean=rep(0,length(s))))
   y.hat <- SigmaPoints$wtt%*%t(h.f.eval.points)
   # -------------------------------------- #
   # Approximate V_t[ h(\theta_t+1) ]
