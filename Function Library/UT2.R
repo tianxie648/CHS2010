@@ -3,6 +3,7 @@
 #' @description Compute the integration (e.g. mean and variance) with a monomial rule as in Appendix A6 (CHS2010).
 #' 
 #' @param n Integer. The dimension of integrated variable, i.e. number of latent factors \eqn{\theta_t}.
+#' @param t Integer. Time periods.
 #' @param M Numeric. matrix of dimension 5xTime. The number of measurements for each factor at each period. Each column of the matrix represents each period. Each row is by order: Child Cognitive, Child Noncognitive, Investment, Parental Cognitive, Parental Noncognitive
 #' @param a Numeric. A column vector of updated mean of the factor.
 #' @param k Numeric. The parameter kappa in the unscented transform. This is set to 2 by default.
@@ -20,7 +21,10 @@
 #' @import expm
 
 
-UT2 <- function(n,M,a,P,f="no.anchor",h="linear",delta.eta=c(1,1),...){
+UT2 <- function(n,t,M,a,P,f="no.anchor",h="linear",delta.eta=c(1,1),...){
+  
+  # Generate stage
+  stage <- 1 + as.numeric(t>4)
   
   # Generate the Sigma points
   SigmaPoints <- sigma.points(n,a,P,k=2)
@@ -78,7 +82,7 @@ UT2 <- function(n,M,a,P,f="no.anchor",h="linear",delta.eta=c(1,1),...){
 }
 
 
-"no.anchor" <- function(theta,gamma,phi=c(.5,.5),delta.eta=c(1,1),stage=n.stage){
+"no.anchor" <- function(theta,gamma,phi=c(.5,.5),delta.eta=c(1,1),stage,n.stage=2){
   
   # This is the production technology in Equation (4.1) in CHS(2010).
   # The production function follows a CES specification. Generally speaking,
@@ -104,7 +108,7 @@ UT2 <- function(n,M,a,P,f="no.anchor",h="linear",delta.eta=c(1,1),...){
   
   # The weights gamma must satisfy some restrictions.
   # Checking the weights are between [0,1] and add up to 1.
-  for (i in 1:stage) {
+  for (i in 1:n.stage) {
     for (k in 1:2) {
       if( !( sum(gamma[k,,i])==1 & all(gamma[k,,i]>=0) & all(gamma[k,,i]<=1)) ){
         print("Factor coefficients must be in the [0,1] interval and add up to one.")
@@ -201,7 +205,7 @@ UT2 <- function(n,M,a,P,f="no.anchor",h="linear",delta.eta=c(1,1),...){
 }
 
 
-"linear" <- function(theta,factor.loadings=rep(1,length(theta)),M,Z.mean=rep(0,length(theta))){
+"linear" <- function(theta,factor.loadings=rep(1,length(theta)),M,t,Z.mean=rep(0,length(theta))){
   
   # This corresponds to the measurement equations in equations
   # (3.1) - (3.3). It is a linear function and corresponds with 
@@ -231,25 +235,22 @@ UT2 <- function(n,M,a,P,f="no.anchor",h="linear",delta.eta=c(1,1),...){
   # Z.mean           Mean vector with the mean of each Z_{a,k,t,j}.
   
   # Measurements for teacher assesment of child cognitive skills
-  Z.1.c <- Z.mean[1:M[1]]+log(theta[1])*factor.loadings[1:M[1]]+rmvnorm(1,rep(0,M[1],diag(1,M[1])))
+  Z.1.c <- Z.mean[1]+log(theta[1])*factor.loadings[1]+rmvnorm(1,rep(0,M[1,t]),diag(1,M[1,t]))
   
   # Measurements for teacher assesment of child noncognitive skills
-  Z.1.n <- Z.mean[(M[1]+1):(M[1]+M[2])]+log(theta[2])*factor.loadings[(M[1]+1):(M[1]+M[2])]+rmvnorm(1,rep(0,M[2],diag(1,M[2])))
+  Z.1.n <- Z.mean[2]+log(theta[2])*factor.loadings[2]+rmvnorm(1,rep(0,M[2,t]),diag(1,M[2,t]))
 
-  # Measurements for investment on cognitive skills
-  Z.2.c <- Z.mean[(M[2]+1):(M[2]+M[3])]+log(theta[3])*factor.loadings[(M[2]+1):(M[2]+M[3])]+rmvnorm(1,rep(0,M[3],diag(1,M[3])))
+  # Measurements for investment
+  Z.2 <- Z.mean[3]+log(theta[3])*factor.loadings[3]+rmvnorm(1,rep(0,M[3,t]),diag(1,M[3,t]))
  
-  # Measurements for investment on noncognitive skills
-  Z.2.n <- Z.mean[(M[3]+1):(M[3]+M[4])]+log(theta[4])*factor.loadings[(M[3]+1):(M[3]+M[4])]+rmvnorm(1,rep(0,M[4],diag(1,M[5])))
-  
   # Measurements for parental cognitive skills
-  Z.3.c <- Z.mean[(M[4]+1):(M[4]+M[5])]+log(theta[5])*factor.loadings[(M[4]+1):(M[4]+M[5])]+rmvnorm(1,rep(0,M[5],diag(1,M[5])))
+  Z.3.c <- Z.mean[4]+log(theta[4])*factor.loadings[4]+rmvnorm(1,rep(0,M[4,t]),diag(1,M[4,t]))
   
   # Measurements for parental noncognitive skills
-  Z.3.n <- Z.mean[(M[5]+1):(M[5]+M[6])]+log(theta[6])*factor.loadings[(M[5]+1):(M[5]+M[6])]+rmvnorm(1,rep(0,M[6],diag(1,M[6])))
+  Z.3.n <- Z.mean[5]+log(theta[5])*factor.loadings[5]+rmvnorm(1,rep(0,M[5,t]),diag(1,M[5,t]))
   
   # Export Results
-  Z <- c(Z.1.c,Z.1.n,Z.2.c,Z.2.n,Z.3.c,Z.3.n)
+  Z <- c(Z.1.c,Z.1.n,Z.2,Z.3.c,Z.3.n)
   return(Z)
 }
 
